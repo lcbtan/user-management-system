@@ -1,8 +1,8 @@
 import { Connection } from 'typeorm';
 import { Factory, Seed, times } from 'typeorm-seeding';
 
-import { Pet } from '../../../src/api/models/Pet';
-import { User } from '../../../src/api/models/User';
+import { AppUser } from '../../api/models/AppUser';
+import { Pet } from '../../api/models/Pet';
 
 export class CreatePets implements Seed {
 
@@ -10,7 +10,7 @@ export class CreatePets implements Seed {
         const em = connection.createEntityManager();
         await times(10, async (n) => {
             const pet = await factory(Pet)().seed();
-            const user = await factory(User)().make();
+            const user = await factory(AppUser)().make();
             user.pets = [pet];
             return await em.save(user);
         });

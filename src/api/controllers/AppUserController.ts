@@ -6,11 +6,11 @@ import {
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
 import { UserNotFoundError } from '../errors/UserNotFoundError';
-import { User } from '../models/User';
-import { UserService } from '../services/UserService';
+import { AppUser } from '../models/AppUser';
+import { AppUserService } from '../services/AppUserService';
 import { PetResponse } from './PetController';
 
-class BaseUser {
+class BaseAppUser {
     @IsNotEmpty()
     public firstName: string;
 
@@ -25,7 +25,7 @@ class BaseUser {
     public username: string;
 }
 
-export class UserResponse extends BaseUser {
+export class AppUserResponse extends BaseAppUser {
     @IsUUID()
     public id: string;
 
@@ -34,7 +34,7 @@ export class UserResponse extends BaseUser {
     public pets: PetResponse[];
 }
 
-class CreateUserBody extends BaseUser {
+class CreateAppUserBody extends BaseAppUser {
     @IsNotEmpty()
     public password: string;
 }
@@ -45,32 +45,32 @@ class CreateUserBody extends BaseUser {
 export class UserController {
 
     constructor(
-        private userService: UserService
+        private userService: AppUserService
     ) { }
 
     @Get()
-    @ResponseSchema(UserResponse, { isArray: true })
-    public find(): Promise<User[]> {
+    @ResponseSchema(AppUserResponse, { isArray: true })
+    public find(): Promise<AppUser[]> {
         return this.userService.find();
     }
 
     @Get('/me')
-    @ResponseSchema(UserResponse, { isArray: true })
-    public findMe(@Req() req: any): Promise<User[]> {
+    @ResponseSchema(AppUserResponse, { isArray: true })
+    public findMe(@Req() req: any): Promise<AppUser[]> {
         return req.user;
     }
 
     @Get('/:id')
     @OnUndefined(UserNotFoundError)
-    @ResponseSchema(UserResponse)
-    public one(@Param('id') id: string): Promise<User | undefined> {
+    @ResponseSchema(AppUserResponse)
+    public one(@Param('id') id: string): Promise<AppUser | undefined> {
         return this.userService.findOne(id);
     }
 
     @Post()
-    @ResponseSchema(UserResponse)
-    public create(@Body() body: CreateUserBody): Promise<User> {
-        const user = new User();
+    @ResponseSchema(AppUserResponse)
+    public create(@Body() body: CreateAppUserBody): Promise<AppUser> {
+        const user = new AppUser();
         user.email = body.email;
         user.firstName = body.firstName;
         user.lastName = body.lastName;
@@ -81,9 +81,9 @@ export class UserController {
     }
 
     @Put('/:id')
-    @ResponseSchema(UserResponse)
-    public update(@Param('id') id: string, @Body() body: BaseUser): Promise<User> {
-        const user = new User();
+    @ResponseSchema(AppUserResponse)
+    public update(@Param('id') id: string, @Body() body: BaseAppUser): Promise<AppUser> {
+        const user = new AppUser();
         user.email = body.email;
         user.firstName = body.firstName;
         user.lastName = body.lastName;

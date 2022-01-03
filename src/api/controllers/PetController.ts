@@ -7,7 +7,7 @@ import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 import { PetNotFoundError } from '../errors/PetNotFoundError';
 import { Pet } from '../models/Pet';
 import { PetService } from '../services/PetService';
-import { UserResponse } from './UserController';
+import { AppUserResponse } from './AppUserController';
 
 class BasePet {
     @IsNotEmpty()
@@ -22,7 +22,7 @@ export class PetResponse extends BasePet {
     public id: string;
 
     @ValidateNested()
-    public user: UserResponse;
+    public user: AppUserResponse;
 }
 
 class CreatePetBody extends BasePet {

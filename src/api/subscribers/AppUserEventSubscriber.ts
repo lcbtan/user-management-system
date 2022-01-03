@@ -1,16 +1,16 @@
 import { EventSubscriber, On } from 'event-dispatch';
 
 import { Logger } from '../../lib/logger';
-import { User } from '../models/User';
+import { AppUser } from '../models/AppUser';
 import { events } from './events';
 
 const log = new Logger(__filename);
 
 @EventSubscriber()
-export class UserEventSubscriber {
+export class AppUserEventSubscriber {
 
     @On(events.user.created)
-    public onUserCreate(user: User): void {
+    public onUserCreate(user: AppUser): void {
         log.info('User ' + user.toString() + ' created!');
     }
 

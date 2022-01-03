@@ -70,6 +70,7 @@ const run = async () => {
       className = className.split('-')[className.split('-').length - 1];
       log('\n' + chalk.gray.underline(`executing seed:  `), chalk.green.bold(`${className}`));
       const seedFileObject: any = require(seedFile);
+      console.log(seedFileObject);
       await runSeed(seedFileObject[className]);
     } catch (error) {
       console.error('Could not run seed ', error);

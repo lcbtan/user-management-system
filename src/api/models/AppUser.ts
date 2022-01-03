@@ -4,9 +4,10 @@ import { IsNotEmpty } from 'class-validator';
 import { BeforeInsert, Column, Entity, OneToMany, PrimaryColumn } from 'typeorm';
 
 import { Pet } from './Pet';
+import { Tour } from './Tour';
 
-@Entity()
-export class User {
+@Entity({ name: 'app_user' })
+export class AppUser {
 
     public static hashPassword(password: string): Promise<string> {
         return new Promise((resolve, reject) => {
@@ -19,7 +20,7 @@ export class User {
         });
     }
 
-    public static comparePassword(user: User, password: string): Promise<boolean> {
+    public static comparePassword(user: AppUser, password: string): Promise<boolean> {
         return new Promise((resolve, reject) => {
             bcrypt.compare(password, user.password, (err, res) => {
                 resolve(res === true);
@@ -51,6 +52,9 @@ export class User {
     @Column()
     public username: string;
 
+    @OneToMany(() => Tour, tour => tour.guide)
+    public tours: Tour[];
+
     @OneToMany(type => Pet, pet => pet.user)
     public pets: Pet[];
 
@@ -60,7 +64,7 @@ export class User {
 
     @BeforeInsert()
     public async hashPassword(): Promise<void> {
-        this.password = await User.hashPassword(this.password);
+        this.password = await AppUser.hashPassword(this.password);
     }
 
 }

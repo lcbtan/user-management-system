@@ -1,7 +1,7 @@
 import { IsNotEmpty } from 'class-validator';
 import { Column, Entity, JoinColumn, ManyToOne, PrimaryColumn } from 'typeorm';
 
-import { User } from './User';
+import { AppUser } from './AppUser';
 
 @Entity()
 export class Pet {
@@ -23,9 +23,9 @@ export class Pet {
     })
     public userId: string;
 
-    @ManyToOne(type => User, user => user.pets)
+    @ManyToOne(type => AppUser, user => user.pets)
     @JoinColumn({ name: 'user_id' })
-    public user: User;
+    public user: AppUser;
 
     public toString(): string {
         return `${this.name}`;

@@ -1,6 +1,6 @@
 import { Request } from 'express';
 import MockExpressRequest from 'mock-express-request';
-import { User } from 'src/api/models/User';
+import { AppUser } from 'src/api/models/AppUser';
 
 import { AuthService } from '../../../src/auth/AuthService';
 import { LogMock } from '../lib/LogMock';
@@ -9,11 +9,11 @@ import { RepositoryMock } from '../lib/RepositoryMock';
 describe('AuthService', () => {
 
     let authService: AuthService;
-    let userRepository: RepositoryMock<User>;
+    let userRepository: RepositoryMock<AppUser>;
     let log: LogMock;
     beforeEach(() => {
         log = new LogMock();
-        userRepository = new RepositoryMock<User>();
+        userRepository = new RepositoryMock<AppUser>();
         authService = new AuthService(log, userRepository as any);
     });
 

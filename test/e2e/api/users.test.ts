@@ -2,7 +2,7 @@ import * as nock from 'nock';
 import request from 'supertest';
 import { runSeed } from 'typeorm-seeding';
 
-import { User } from '../../../src/api/models/User';
+import { AppUser } from '../../../src/api/models/AppUser';
 import { CreateBruce } from '../../../src/database/seeds/CreateBruce';
 import { closeDatabase } from '../../utils/database';
 import { BootstrapSettings } from '../utils/bootstrap';
@@ -10,7 +10,7 @@ import { prepareServer } from '../utils/server';
 
 describe('/api/users', () => {
 
-    let bruce: User;
+    let bruce: AppUser;
     let bruceAuthorization: string;
     let settings: BootstrapSettings;
 
@@ -20,7 +20,7 @@ describe('/api/users', () => {
 
     beforeAll(async () => {
         settings = await prepareServer({ migrate: true });
-        bruce = await runSeed<User>(CreateBruce);
+        bruce = await runSeed<AppUser>(CreateBruce);
         bruceAuthorization = Buffer.from(`${bruce.username}:1234`).toString('base64');
     });
 

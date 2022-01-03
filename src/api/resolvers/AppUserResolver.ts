@@ -1,9 +1,9 @@
 import { FieldResolver, Query, Resolver, Root } from 'type-graphql';
 import { Service } from 'typedi';
 
-import { User as UserModel } from '../models/User';
+import { AppUser as UserModel } from '../models/AppUser';
+import { AppUserService } from '../services/AppUserService';
 import { PetService } from '../services/PetService';
-import { UserService } from '../services/UserService';
 import { User } from '../types/User';
 
 @Service()
@@ -11,7 +11,7 @@ import { User } from '../types/User';
 export class UserResolver {
 
     constructor(
-        private userService: UserService,
+        private userService: AppUserService,
         private petService: PetService
         ) {}
 
