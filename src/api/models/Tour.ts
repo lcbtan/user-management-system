@@ -5,6 +5,7 @@ import {
     BeforeInsert, BeforeUpdate, Check, Column, Entity, ManyToOne, PrimaryGeneratedColumn
 } from 'typeorm';
 
+import { TQueryableFields } from '../types/query';
 import { AppUser } from './AppUser';
 
 export enum TourDifficulty {
@@ -12,6 +13,47 @@ export enum TourDifficulty {
     MEDIUM = 'medium',
     DIFFICULT = 'difficult',
 }
+
+export const TOUR_QUERY_FIELDS: TQueryableFields = {
+    search: [
+        'id',
+        'name',
+        'slugName',
+        'difficulty',
+        'guide',
+    ],
+    filter: {
+        string: [
+            'id',
+            'name',
+            'slugName',
+            'difficulty',
+            'guide',
+        ],
+        numeric: [
+            'duration',
+            'price',
+        ],
+    },
+    sort: [
+        'id',
+        'name',
+        'slugName',
+        'difficulty',
+        'guide',
+        'duration',
+        'price',
+    ],
+    select: [
+        'id',
+        'name',
+        'slugName',
+        'difficulty',
+        'guide',
+        'duration',
+        'price',
+    ],
+};
 
 @Entity()
 @Check('tour_name_len', 'char_length(name) >= 10 AND char_length(name) <= 40')
@@ -50,7 +92,7 @@ export class Tour {
     public price: number;
 
     @IsBoolean()
-    @Column({ default: false })
+    @Column({ default: false, select: false })
     public isArchived: boolean;
 
     @ManyToOne(() => AppUser)

@@ -1,11 +1,11 @@
 import { Type } from 'class-transformer';
-import { IsBoolean, IsDecimal, IsNotEmpty, IsNumber, ValidateNested } from 'class-validator';
-import { Get, JsonController } from 'routing-controllers';
+import { IsDecimal, IsNotEmpty, IsNumber, ValidateNested } from 'class-validator';
+import { Body, JsonController, Post, QueryParams } from 'routing-controllers';
 import { ResponseSchema } from 'routing-controllers-openapi';
 
 import { Tour, TourDifficulty } from '../models/Tour';
 import { TourService } from '../services/TourService';
-import { AppUserResponse } from './AppUserController';
+import { FindResourceBody, FindResourceQuery } from '../types/query';
 
 class BaseTour {
     @IsNotEmpty()
@@ -21,9 +21,9 @@ class BaseTour {
     @IsDecimal()
     public price: number;
 
-    @IsNotEmpty()
-    @IsBoolean()
-    public isArchived: boolean;
+    // @IsNotEmpty()
+    // @IsBoolean()
+    // public isArchived: boolean;
 }
 
 class TourResponse extends BaseTour {
@@ -33,9 +33,18 @@ class TourResponse extends BaseTour {
     @IsNotEmpty()
     public slugName: string;
 
-    @ValidateNested()
-    @Type(() => AppUserResponse)
-    public guide: AppUserResponse;
+    // @ValidateNested()
+    // @Type(() => AppUserResponse)
+    // public guide: AppUserResponse;
+}
+
+class TourQueryResponse {
+    @IsNumber()
+    public result: number;
+
+    @ValidateNested({ each: true })
+    @Type(() => TourResponse)
+    public tours: TourResponse;
 }
 
 @JsonController('/tours')
@@ -44,9 +53,14 @@ export class TourController {
         private tourService: TourService
     ) { }
 
-    @Get()
-    @ResponseSchema(TourResponse, { isArray: true })
-    public getAll(): Promise<Tour[]> {
-        return this.tourService.findAll();
+    @Post()
+    @ResponseSchema(TourQueryResponse)
+    public async getTours(@QueryParams() query: FindResourceQuery, @Body() body: FindResourceBody): Promise<[Tour[], number]> {
+        // const queryResults = await this.tourService.findAll({ query, body });
+        // const res: TourQueryResponse = {
+        //     result: queryResults[1],
+        //     tours: queryResults[0],
+        // }
+        return this.tourService.findAll({ query, body });
     }
 }
