@@ -1,8 +1,7 @@
-import { Trim } from 'class-sanitizer';
-import { IsBoolean, IsDecimal, IsNotEmpty, MaxLength, MinLength } from 'class-validator';
+import { IsBoolean, IsNotEmpty, IsNumber, MaxLength, MinLength } from 'class-validator';
 import slug from 'slug';
 import {
-    BeforeInsert, BeforeUpdate, Check, Column, Entity, ManyToOne, PrimaryGeneratedColumn
+    BeforeInsert, BeforeUpdate, Check, Column, Entity, JoinColumn, ManyToOne, PrimaryGeneratedColumn
 } from 'typeorm';
 
 import { TQueryableFields } from '../types/query';
@@ -64,7 +63,6 @@ export class Tour {
     @MinLength(10, { message: 'A tour name must have more or equal to 10 characters' })
     @MaxLength(40, { message: 'A tour name must have less or equal to 40 characters' })
     @IsNotEmpty({ message: 'A tour must have a name' })
-    @Trim()
     @Column({
         unique: true,
         type: 'varchar',
@@ -76,6 +74,7 @@ export class Tour {
     public slugName: string;
 
     @IsNotEmpty({ message: 'A tour must have a duration '})
+    @IsNumber()
     @Column()
     public duration: number;
 
@@ -87,7 +86,7 @@ export class Tour {
     public difficulty: TourDifficulty;
 
     @IsNotEmpty({ message: 'A tour must have a price '})
-    @IsDecimal()
+    @IsNumber()
     @Column({ type: 'decimal' })
     public price: number;
 
@@ -95,7 +94,11 @@ export class Tour {
     @Column({ default: false, select: false })
     public isArchived: boolean;
 
+    @Column({ name: 'guide_id'})
+    public guideId: string;
+
     @ManyToOne(() => AppUser)
+    @JoinColumn({ name: 'guide_id' })
     public guide: AppUser;
 
     public toString(): string {
@@ -105,6 +108,8 @@ export class Tour {
     @BeforeInsert()
     @BeforeUpdate()
     public populateSlugName(): void {
-        this.slugName = slug(this.name);
+        if (this.name) {
+            this.slugName = slug(this.name);
+        }
     }
 }

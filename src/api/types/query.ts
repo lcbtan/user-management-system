@@ -1,6 +1,6 @@
-import { Trim } from 'class-sanitizer';
+import { Type } from 'class-transformer';
 import {
-    IsAlpha, IsArray, IsEnum, IsNumber, IsOptional, Length, Min, MinLength, ValidateNested
+    IsAlpha, IsArray, IsEnum, IsNotEmpty, IsNumber, IsOptional, Min, ValidateIf, ValidateNested
 } from 'class-validator';
 
 export enum SortValue {
@@ -8,57 +8,96 @@ export enum SortValue {
     DESC = 'DESC',
 }
 
+export enum FilterType {
+    STRING = 'STRING',
+    NUMERIC = 'NUMERIC',
+    // DATE = 'DATE',
+}
+
 export class SortQuery {
     @IsAlpha()
-    @Trim()
     public key: string;
 
     @IsEnum(SortValue)
-    @Trim()
     public value: SortValue;
 }
 
 export class SearchQuery {
-
-    @IsAlpha() // TODO: assuming is alpha also check if it is not empty
-    @Trim()
+    @IsAlpha()
     public key: string;
 
-    @Length(7)
-    @MinLength(7)
-    @Trim()
+    @IsNotEmpty()
     public value: string;
 }
 
-export class FindResourceQuery {
+export class StringFilterType {
+    @IsNotEmpty()
+    public value: string;
+}
+
+export class NumericFilterType {
     @IsNumber()
+    @IsNotEmpty()
+    public min: number;
+    @IsNumber()
+    @IsNotEmpty()
+    public max: number;
+}
+
+export class FilterQuery {
+    @IsAlpha()
+    @IsNotEmpty()
+    public key: string;
+
+    @IsEnum(FilterType)
+    public type: FilterType;
+
+    @ValidateIf((object: FilterQuery) => object.type === FilterType.STRING)
+    @Type(() => StringFilterType)
+    @IsNotEmpty()
+    public string: StringFilterType;
+
+    @ValidateIf((object: FilterQuery) => object.type === FilterType.NUMERIC)
+    @Type(() => NumericFilterType)
+    @IsNotEmpty()
+    public numeric: NumericFilterType;
+}
+
+export class FindResourceQuery {
+    @Min(1)
+    @IsNumber()
+    @Type(() => Number)
     @IsOptional()
     public page?: number;
 
-    @ValidateNested({ each: true })
-    @IsArray()
+    @Min(1)
+    @IsNumber()
+    @Type(() => Number)
     @IsOptional()
-    public sort?: SortQuery[];
+    public limit?: number;
 }
 
 export class FindResourceBody {
-    @IsAlpha(undefined, { each: true })
-    @Trim(undefined, { each: true })
+    @IsAlpha({ each: true })
     @IsOptional()
     public fields?: string[];
 
-    @Min(0)
-    @IsNumber()
-    @IsOptional()
-    public limit?: number;
-
     @ValidateNested({ each: true })
+    @Type(() => FilterQuery)
     @IsArray()
-    public filter?: SearchQuery[];
+    @IsOptional()
+    public filter?: FilterQuery[];
 
     @ValidateNested()
+    @Type(() => SearchQuery)
     @IsOptional()
     public search?: SearchQuery;
+
+    @ValidateNested({ each: true })
+    @Type(() => SortQuery)
+    @IsArray()
+    @IsOptional()
+    public sort?: SortQuery[];
 }
 
 export interface TFindResourceOptions {

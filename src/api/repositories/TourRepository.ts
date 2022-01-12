@@ -9,4 +9,9 @@ export class TourRepository extends Repository<Tour> {
             isArchived: Not(true),
         });
     }
+    public findFilterdAll(): Promise<Tour[]> {
+        return this.find({
+            isArchived: Not(true),
+        });
+    }
 }
