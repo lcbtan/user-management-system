@@ -1,6 +1,6 @@
 {
     "compilerOptions": {
-        "target": "es6",
+        "target": "es2021",
         "module": "commonjs",
         "pretty": true,
         "sourceMap": true,
@@ -35,7 +35,8 @@
             "es2015.reflect",
             "es2015.symbol",
             "es2015.symbol.wellknown",
-            "esnext.asynciterable"
+            "esnext.asynciterable",
+            "es2021"
         ]
     }
 }
