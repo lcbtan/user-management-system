@@ -2,7 +2,7 @@ import { Connection } from 'typeorm';
 import { Factory, Seed } from 'typeorm-seeding';
 import * as uuid from 'uuid';
 
-import { AppUser, AppUserRole } from '../../api/models/AppUser';
+import { AppUser } from '../../api/models/AppUser';
 
 export class CreateBruce implements Seed {
   public seed(factory: Factory, connection: Connection): Promise<AppUser> {
@@ -35,7 +35,10 @@ export class CreateBruce implements Seed {
     user.email = 'bruce.wayne@wayne-enterprises.com';
     user.username = 'bruce';
     user.password = '1234';
-    user.role = AppUserRole.Admin;
+    user.address = 'Sample address';
+    user.postCode = '1111';
+    user.contactNo = '12345678901';
+    // user.role = AppUserRole.Admin;
     return em.save(user);
   }
 }

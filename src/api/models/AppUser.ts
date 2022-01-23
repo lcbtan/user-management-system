@@ -1,13 +1,7 @@
 import * as bcrypt from 'bcrypt';
 import { Exclude } from 'class-transformer';
-import { IsNotEmpty } from 'class-validator';
+import { IsAlpha, IsEmail, IsNotEmpty, IsNumberString, IsUUID } from 'class-validator';
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
-
-export enum AppUserRole {
-  Admin = 'admin',
-  Guest = 'guest',
-  User = 'user',
-}
 
 @Entity({ name: 'app_user' })
 export class AppUser {
@@ -19,35 +13,50 @@ export class AppUser {
     return bcrypt.compare(password, user.password);
   }
 
+  @IsUUID()
   @PrimaryColumn('uuid')
   public id: string;
 
   @IsNotEmpty()
+  @IsAlpha()
   @Column({ name: 'first_name' })
   public firstName: string;
 
   @IsNotEmpty()
+  @IsAlpha()
   @Column({ name: 'last_name' })
   public lastName: string;
 
   @IsNotEmpty()
   @Column()
+  public address: string;
+
+  @IsNotEmpty()
+  @IsNumberString()
+  @Column()
+  public postCode: string;
+
+  @IsNotEmpty()
+  @IsNumberString()
+  // @Length(12, 12) // For example: 639123456891
+  @Column()
+  public contactNo: string;
+
+  @IsNotEmpty()
+  @IsEmail()
+  @Column()
   public email: string;
+
+  @IsNotEmpty()
+  @Column({
+    unique: true,
+  })
+  public username: string;
 
   @IsNotEmpty()
   @Column()
   @Exclude()
   public password: string;
-
-  @IsNotEmpty()
-  @Column()
-  public username: string;
-
-  @Column({
-    enum: AppUserRole,
-    default: AppUserRole.User,
-  })
-  public role: AppUserRole;
 
   public toString(): string {
     return `${this.firstName} ${this.lastName} (${this.email})`;

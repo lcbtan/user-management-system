@@ -34,14 +34,18 @@ export class AppUserService {
     return newUser;
   }
 
-  public update(id: string, user: AppUser): Promise<AppUser> {
+  public async update(id: string, user: Partial<AppUser>): Promise<void> {
     this.log.info('Update a user');
-    user.id = id;
-    return this.userRepository.save(user);
+    await this.userRepository.update(id, user);
   }
 
   public async delete(id: string): Promise<void> {
     this.log.info('Delete a user');
     await this.userRepository.delete(id);
+  }
+
+  public async deleteMany(ids: string[]): Promise<void> {
+    this.log.info('Delete a user');
+    await Promise.all(ids.map((id) => this.userRepository.delete(id)));
   }
 }

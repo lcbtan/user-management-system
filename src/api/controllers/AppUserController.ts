@@ -1,5 +1,18 @@
-import { IsEmail, IsNotEmpty, IsUUID } from 'class-validator';
-import { Authorized, Body, Delete, Get, JsonController, OnUndefined, Param, Post, Put, Req } from 'routing-controllers';
+import { IsAlpha, IsEmail, IsNotEmpty, IsNumberString, IsUUID, Length, MinLength } from 'class-validator';
+import {
+  Authorized,
+  BadRequestError,
+  Body,
+  Delete,
+  Get,
+  JsonController,
+  OnUndefined,
+  Param,
+  Patch,
+  Post,
+  QueryParams,
+  Req,
+} from 'routing-controllers';
 import { OpenAPI, ResponseSchema } from 'routing-controllers-openapi';
 
 import { UserNotFoundError } from '../errors/UserNotFoundError';
@@ -8,10 +21,25 @@ import { AppUserService } from '../services/AppUserService';
 
 class BaseAppUser {
   @IsNotEmpty()
+  @IsAlpha()
   public firstName: string;
 
   @IsNotEmpty()
+  @IsAlpha()
   public lastName: string;
+
+  @IsNotEmpty()
+  public address: string;
+
+  @IsNotEmpty()
+  @IsNumberString()
+  @Length(4, 4)
+  public postCode: string;
+
+  @IsNotEmpty()
+  @IsNumberString()
+  @Length(12, 12) // For example: 639123456891
+  public contactNo: string;
 
   @IsEmail()
   @IsNotEmpty()
@@ -28,6 +56,7 @@ export class AppUserResponse extends BaseAppUser {
 
 class CreateAppUserBody extends BaseAppUser {
   @IsNotEmpty()
+  @MinLength(6)
   public password: string;
 }
 
@@ -58,31 +87,63 @@ export class UserController {
 
   @Post()
   @ResponseSchema(AppUserResponse)
-  public create(@Body() body: CreateAppUserBody): Promise<AppUser> {
+  public create(@Body({ required: true }) body: CreateAppUserBody): Promise<AppUser> {
     const user = new AppUser();
     user.email = body.email;
     user.firstName = body.firstName;
     user.lastName = body.lastName;
     user.password = body.password;
     user.username = body.username;
+    user.address = body.address;
+    user.postCode = body.postCode;
+    user.contactNo = body.contactNo;
 
     return this.userService.create(user);
   }
 
-  @Put('/:id')
+  @Patch('/:id')
+  @OnUndefined(204)
   @ResponseSchema(AppUserResponse)
-  public update(@Param('id') id: string, @Body() body: BaseAppUser): Promise<AppUser> {
+  public async update(@Param('id') id: string, @Body() body: Partial<BaseAppUser>): Promise<AppUser | void> {
     const user = new AppUser();
-    user.email = body.email;
-    user.firstName = body.firstName;
-    user.lastName = body.lastName;
-    user.username = body.username;
+    if (body.email) {
+      user.email = body.email;
+    }
+    if (body.firstName) {
+      user.firstName = body.firstName;
+    }
+    if (body.lastName) {
+      user.lastName = body.lastName;
+    }
+    if (body.username) {
+      user.username = body.username;
+    }
+    if (body.address) {
+      user.address = body.address;
+    }
+    if (body.postCode) {
+      user.postCode = body.postCode;
+    }
+    if (body.contactNo) {
+      user.contactNo = body.contactNo;
+    }
 
-    return this.userService.update(id, user);
+    try {
+      await this.userService.update(id, user);
+    } catch (err) {
+      throw new BadRequestError('Unable to update the given user');
+    }
   }
 
   @Delete('/:id')
+  @OnUndefined(204)
   public delete(@Param('id') id: string): Promise<void> {
     return this.userService.delete(id);
+  }
+
+  @Delete()
+  @OnUndefined(204)
+  public deleteMany(@QueryParams() ids: string[]): Promise<void> {
+    return this.userService.deleteMany(ids);
   }
 }

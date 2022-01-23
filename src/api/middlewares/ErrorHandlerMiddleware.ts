@@ -15,7 +15,8 @@ export class ErrorHandlerMiddleware implements ExpressErrorMiddlewareInterface {
     res.json({
       name: error.name,
       message: error.message,
-      errors: error.errors || [],
+      // eslint-disable-next-line @typescript-eslint/dot-notation
+      errors: error[`errors`] || [],
     });
 
     if (this.isProduction) {
