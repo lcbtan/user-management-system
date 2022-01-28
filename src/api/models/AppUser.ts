@@ -3,6 +3,11 @@ import { Exclude } from 'class-transformer';
 import { IsAlpha, IsEmail, IsNotEmpty, IsNumberString, IsUUID } from 'class-validator';
 import { BeforeInsert, Column, Entity, PrimaryColumn } from 'typeorm';
 
+export enum AppUserRole {
+  ADMIN = 'ADMIN',
+  USER = 'USER',
+}
+
 @Entity({ name: 'app_user' })
 export class AppUser {
   public static hashPassword(password: string): Promise<string> {
@@ -38,13 +43,14 @@ export class AppUser {
 
   @IsNotEmpty()
   @IsNumberString()
-  // @Length(12, 12) // For example: 639123456891
   @Column()
   public contactNo: string;
 
   @IsNotEmpty()
   @IsEmail()
-  @Column()
+  @Column({
+    unique: true,
+  })
   public email: string;
 
   @IsNotEmpty()
@@ -57,6 +63,14 @@ export class AppUser {
   @Column()
   @Exclude()
   public password: string;
+
+  @IsNotEmpty()
+  @Column({
+    type: 'enum',
+    enum: AppUserRole,
+    default: AppUserRole.USER,
+  })
+  public role: AppUserRole;
 
   public toString(): string {
     return `${this.firstName} ${this.lastName} (${this.email})`;

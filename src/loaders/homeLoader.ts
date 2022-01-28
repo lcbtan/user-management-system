@@ -5,8 +5,6 @@ import { env } from '../env';
 
 export const homeLoader: MicroframeworkLoader = (settings: MicroframeworkSettings | undefined) => {
   if (settings) {
-    // eslint-disable-next-line no-console
-    console.log('homeLoader');
     const expressApp = settings.getData('express_app');
     expressApp.get(env.app.routePrefix, (req: express.Request, res: express.Response) =>
       res.json({

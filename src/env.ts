@@ -78,4 +78,9 @@ export const env = {
       cookieExpiration: toNumber(getOsEnv('JWT_COOKIE_EXPIRATION')),
     },
   },
+  limit: {
+    rateLimit: toNumber(getOsEnv('RATE_LIMIT')),
+    rateWindowTime: toNumber(getOsEnv('RATE_WINDOW_TIME')),
+    bodyPayloadLimit: getOsEnv('BODY_PAYLOAD_LIMIT'),
+  },
 };

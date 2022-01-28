@@ -2,7 +2,7 @@ import * as Faker from 'faker';
 import { define } from 'typeorm-seeding';
 import * as uuid from 'uuid';
 
-import { AppUser } from '../../api/models/AppUser';
+import { AppUser, AppUserRole } from '../../api/models/AppUser';
 
 define(AppUser, (faker: typeof Faker, settings: { role: string }) => {
   const gender = faker.random.number(1);
@@ -25,7 +25,6 @@ define(AppUser, (faker: typeof Faker, settings: { role: string }) => {
   user.postCode = postCode;
   user.contactNo = contactNo;
 
-  // const roleValues = Object.values(AppUserRole);
-  // user.role = roleValues[Math.floor(Math.random() * roleValues.length)];
+  user.role = AppUserRole.USER;
   return user;
 });

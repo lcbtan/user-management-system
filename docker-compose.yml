@@ -1,0 +1,32 @@
+version: '3.7'
+networks:
+  backend:
+
+services:
+  mysql_db:
+    restart: always
+    image: mysql
+    networks:
+      - backend
+    environment:
+      - MYSQL_ROOT_PASSWORD=${TYPEORM_PASSWORD:-root}
+      - MYSQL_DATABASE=my_database
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-p$$MYSQL_ROOT_PASSWORD"]
+      timeout: 10s
+      retries: 5
+  nodeapp:
+    build:
+      context: ./
+    restart: always
+    depends_on:
+      mysql_db:
+        condition: service_healthy
+    environment:
+      - TYPEORM_HOST=mysql_db
+    networks:
+      - backend
+    command: yarn dev
+    ports:
+      - "${APP_PORT:-3000}:3000"
+

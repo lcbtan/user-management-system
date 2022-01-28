@@ -25,7 +25,8 @@ export function authorizationChecker(
         log.warn('No user retrieved');
         return false;
       }
-      return true;
+      if (!roles.length) return true;
+      return roles.includes(action.request.user.role);
     };
   }
 

@@ -1,3 +1,4 @@
+import { BadRequestError } from 'routing-controllers';
 import { Service } from 'typedi';
 import { OrmRepository } from 'typeorm-typedi-extensions';
 import uuid from 'uuid';
@@ -18,12 +19,12 @@ export class AppUserService {
 
   public find(): Promise<AppUser[]> {
     this.log.info('Find all users');
-    return this.userRepository.find({ relations: ['pets'] });
+    return this.userRepository.find();
   }
 
   public findOne(id: string): Promise<AppUser | undefined> {
     this.log.info('Find one user');
-    return this.userRepository.findOne({ id });
+    return this.userRepository.findOneOrFail({ id });
   }
 
   public async create(user: AppUser): Promise<AppUser> {
@@ -36,6 +37,7 @@ export class AppUserService {
 
   public async update(id: string, user: Partial<AppUser>): Promise<void> {
     this.log.info('Update a user');
+    await this.userRepository.findOneOrFail({ id });
     await this.userRepository.update(id, user);
   }
 
@@ -46,6 +48,10 @@ export class AppUserService {
 
   public async deleteMany(ids: string[]): Promise<void> {
     this.log.info('Delete a user');
-    await Promise.all(ids.map((id) => this.userRepository.delete(id)));
+    const appUsers = await this.userRepository.findByIds(ids);
+    if (appUsers.length !== ids.length) {
+      throw new BadRequestError('Not all ids are existing.');
+    }
+    await this.userRepository.delete(ids);
   }
 }

@@ -22,8 +22,12 @@ export class AuthOService {
     if (request.headers.authorization && request.headers.authorization.startsWith('Bearer')) {
       return request.headers.authorization.split(' ')[1];
     }
-    if (request.cookies && request.cookies.jwt) {
+    if (request.cookies?.jwt) {
       return request.cookies.jwt;
+    }
+
+    if (request.headers.cookie) {
+      return request.headers.cookie.split('=')[1];
     }
     return undefined;
   }
@@ -45,13 +49,15 @@ export class AuthOService {
     return user;
   }
 
-  public async createToken(req: express.Request, res: express.Response, user: AppUser): Promise<void> {
+  public async createToken(req: express.Request, res: express.Response, user: AppUser): Promise<string> {
     const token = await this.signToken(user.id);
     res.cookie('jwt', token, {
       expires: new Date(Date.now() + env.auth.jwt.cookieExpiration * 24 * 60 * 60 * 1000),
       httpOnly: true,
       secure: req.secure || req.headers['x-forwarded-proto'] === 'https',
+      sameSite: 'strict',
     });
+    return token;
   }
 
   public invalidateToken(res: express.Response): void {

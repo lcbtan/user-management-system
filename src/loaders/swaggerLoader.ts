@@ -1,6 +1,4 @@
-import {
-    defaultMetadataStorage as classTransformerMetadataStorage
-} from 'class-transformer/storage';
+import { defaultMetadataStorage as classTransformerMetadataStorage } from 'class-transformer/storage';
 import { getFromContainer, MetadataStorage } from 'class-validator';
 import { validationMetadatasToSchemas } from 'class-validator-jsonschema';
 import basicAuth from 'express-basic-auth';
@@ -22,6 +20,26 @@ export const swaggerLoader: MicroframeworkLoader = (settings: MicroframeworkSett
       refPointerPrefix: '#/components/schemas/',
     });
 
+    try {
+      routingControllersToSpec(
+        getMetadataArgsStorage(),
+        {},
+        {
+          components: {
+            schemas,
+            securitySchemes: {
+              basicAuth: {
+                type: 'http',
+                scheme: 'basic',
+              },
+            },
+          },
+        }
+      );
+    } catch (err) {
+      // eslint-disable-next-line no-console
+      console.log(err);
+    }
     const swaggerFile = routingControllersToSpec(
       getMetadataArgsStorage(),
       {},
@@ -37,7 +55,6 @@ export const swaggerLoader: MicroframeworkLoader = (settings: MicroframeworkSett
         },
       }
     );
-
     // Add npm infos to the swagger doc
     swaggerFile.info = {
       title: env.app.name,

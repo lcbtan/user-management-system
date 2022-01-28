@@ -5,6 +5,7 @@
     "christian-kohler.path-intellisense",
     "mikestead.dotenv",
     "Orta.vscode-jest",
-    "dbaeumer.vscode-eslint"
+    "dbaeumer.vscode-eslint",
+    "esbenp.prettier-vscode"
   ]
 }
